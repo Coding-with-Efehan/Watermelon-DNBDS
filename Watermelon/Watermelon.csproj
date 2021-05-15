@@ -13,10 +13,4 @@
     <PackageReference Include="Discord.Net.WebSocket" Version="2.3.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>
