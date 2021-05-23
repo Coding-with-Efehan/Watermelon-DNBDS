@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Watermelon.Services;
 
 namespace Watermelon
 {
@@ -50,8 +51,8 @@ namespace Watermelon
                 })
                 .ConfigureServices((context, services) =>
                 {
-                    //services
-                    //    .AddHostedService<CommandHandler>();
+                    services
+                        .AddHostedService<CommandHandler>();
                 })
                 .UseConsoleLifetime();
 
