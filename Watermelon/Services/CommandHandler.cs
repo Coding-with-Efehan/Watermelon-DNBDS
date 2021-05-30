@@ -30,7 +30,18 @@ namespace Watermelon.Services
         public override async Task InitializeAsync(CancellationToken cancellationToken)
         {
             this.client.MessageReceived += OnMessageReceived;
+            this.service.CommandExecuted += OnCommandExecuted;
             await this.service.AddModulesAsync(Assembly.GetEntryAssembly(), this.provider);
+        }
+
+        private async Task OnCommandExecuted(Optional<CommandInfo> commandInfo, ICommandContext commandContext, IResult result)
+        {
+            if (result.IsSuccess)
+            {
+                return;
+            }
+
+            await commandContext.Channel.SendMessageAsync(result.ErrorReason);
         }
 
         private async Task OnMessageReceived(SocketMessage socketMessage)
