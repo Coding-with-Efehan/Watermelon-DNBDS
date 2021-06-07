@@ -1,33 +1,41 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Watermelon.Modules
+﻿namespace Watermelon.Modules
 {
+    using System.Threading.Tasks;
+    using Discord;
+    using Discord.Commands;
+    using Discord.WebSocket;
+
+    /// <summary>
+    /// The general module containing commands like ping.
+    /// </summary>
     public class General : ModuleBase<SocketCommandContext>
     {
+        /// <summary>
+        /// A command that will respond with pong.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
         [Command("ping")]
         [Alias("p")]
         public async Task PingAsync()
         {
-            await Context.Channel.TriggerTypingAsync();
-            await Context.Channel.SendMessageAsync("Pong!");
-            await Context.User.SendMessageAsync("Hey! This is a private message!");
+            await this.Context.Channel.TriggerTypingAsync();
+            await this.Context.Channel.SendMessageAsync("Pong!");
         }
 
+        /// <summary>
+        /// A command to get some information about a user.
+        /// </summary>
+        /// <param name="socketGuildUser">An optional user to get the information from.</param>
+        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
         [Command("info")]
         public async Task InfoAsync(SocketGuildUser socketGuildUser = null)
         {
             if (socketGuildUser == null)
             {
-                socketGuildUser = Context.User as SocketGuildUser;
+                socketGuildUser = this.Context.User as SocketGuildUser;
             }
 
-            await ReplyAsync($"ID: {socketGuildUser.Id}\n" +
+            await this.ReplyAsync($"ID: {socketGuildUser.Id}\n" +
                 $"Name: {socketGuildUser.Username}#{socketGuildUser.Discriminator}\n" +
                 $"Created at: {socketGuildUser.CreatedAt}");
         }

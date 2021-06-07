@@ -1,21 +1,23 @@
-﻿using Discord;
-using Discord.Addons.Hosting;
-using Discord.Commands;
-using Discord.WebSocket;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Watermelon.Services;
-
-namespace Watermelon
+﻿namespace Watermelon
 {
-    class Program
+    using System.IO;
+    using System.Threading.Tasks;
+    using Discord;
+    using Discord.Addons.Hosting;
+    using Discord.Commands;
+    using Discord.WebSocket;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
+    using Watermelon.Services;
+
+    /// <summary>
+    /// The entry point of the bot.
+    /// </summary>
+    internal class Program
     {
-        static async Task Main()
+        private static async Task Main()
         {
             var builder = new HostBuilder()
                 .ConfigureAppConfiguration(x =>
