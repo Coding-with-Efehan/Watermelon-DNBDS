@@ -4,6 +4,7 @@
     using Discord;
     using Discord.Commands;
     using Discord.WebSocket;
+    using Watermelon.Common;
 
     /// <summary>
     /// The general module containing commands like ping.
@@ -35,9 +36,16 @@
                 socketGuildUser = this.Context.User as SocketGuildUser;
             }
 
-            await this.ReplyAsync($"ID: {socketGuildUser.Id}\n" +
-                $"Name: {socketGuildUser.Username}#{socketGuildUser.Discriminator}\n" +
-                $"Created at: {socketGuildUser.CreatedAt}");
+            var embed = new WatermelonEmbedBuilder()
+                .WithTitle($"{socketGuildUser.Username}#{socketGuildUser.Discriminator}")
+                .AddField("ID", socketGuildUser.Id, true)
+                .AddField("Name", $"{socketGuildUser.Username}#{socketGuildUser.Discriminator}", true)
+                .AddField("Created at", socketGuildUser.CreatedAt, true)
+                .WithThumbnailUrl(socketGuildUser.GetAvatarUrl() ?? socketGuildUser.GetDefaultAvatarUrl())
+                .WithCurrentTimestamp()
+                .Build();
+
+            await this.ReplyAsync(embed: embed);
         }
     }
 }
