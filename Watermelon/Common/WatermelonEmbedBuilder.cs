@@ -12,7 +12,7 @@
         /// </summary>
         public WatermelonEmbedBuilder()
         {
-            this.WithColor(new Color(238, 62, 75));
+            WithColor(new Color(238, 62, 75));
         }
     }
 }

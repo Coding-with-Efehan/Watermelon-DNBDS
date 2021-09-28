@@ -54,7 +54,8 @@
                 .ConfigureServices((context, services) =>
                 {
                     services
-                        .AddHostedService<CommandHandler>();
+                        .AddHostedService<CommandHandler>()
+                        .AddHttpClient();
                 })
                 .UseConsoleLifetime();
 

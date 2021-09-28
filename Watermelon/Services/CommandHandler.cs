@@ -15,10 +15,10 @@
     /// </summary>
     public class CommandHandler : InitializedService
     {
-        private readonly IServiceProvider provider;
-        private readonly DiscordSocketClient client;
-        private readonly CommandService service;
-        private readonly IConfiguration configuration;
+        private readonly IServiceProvider _provider;
+        private readonly DiscordSocketClient _client;
+        private readonly CommandService _service;
+        private readonly IConfiguration _configuration;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandHandler"/> class.
@@ -29,18 +29,18 @@
         /// <param name="configuration">The <see cref="IConfiguration"/> that should be injected.</param>
         public CommandHandler(IServiceProvider provider, DiscordSocketClient client, CommandService service, IConfiguration configuration)
         {
-            this.provider = provider;
-            this.client = client;
-            this.service = service;
-            this.configuration = configuration;
+            _provider = provider;
+            _client = client;
+            _service = service;
+            _configuration = configuration;
         }
 
         /// <inheritdoc/>
         public override async Task InitializeAsync(CancellationToken cancellationToken)
         {
-            this.client.MessageReceived += this.OnMessageReceived;
-            this.service.CommandExecuted += this.OnCommandExecuted;
-            await this.service.AddModulesAsync(Assembly.GetEntryAssembly(), this.provider);
+            _client.MessageReceived += OnMessageReceived;
+            _service.CommandExecuted += OnCommandExecuted;
+            await _service.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
         }
 
         private async Task OnCommandExecuted(Optional<CommandInfo> commandInfo, ICommandContext commandContext, IResult result)
@@ -66,13 +66,13 @@
             }
 
             var argPos = 0;
-            if (!message.HasStringPrefix(this.configuration["Prefix"], ref argPos) && !message.HasMentionPrefix(this.client.CurrentUser, ref argPos))
+            if (!message.HasStringPrefix(_configuration["Prefix"], ref argPos) && !message.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
                 return;
             }
 
-            var context = new SocketCommandContext(this.client, message);
-            await this.service.ExecuteAsync(context, argPos, this.provider);
+            var context = new SocketCommandContext(_client, message);
+            await _service.ExecuteAsync(context, argPos, _provider);
         }
     }
 }

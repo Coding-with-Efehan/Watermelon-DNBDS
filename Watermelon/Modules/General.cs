@@ -1,16 +1,29 @@
 ﻿namespace Watermelon.Modules
 {
+    using System.Net.Http;
     using System.Threading.Tasks;
     using Discord;
     using Discord.Commands;
     using Discord.WebSocket;
     using Watermelon.Common;
+    using Watermelon.Models;
 
     /// <summary>
     /// The general module containing commands like ping.
     /// </summary>
     public class General : ModuleBase<SocketCommandContext>
     {
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="General"/> class.
+        /// </summary>
+        /// <param name="httpClientFactory">The <see cref="IHttpClientFactory"/> to be used.</param>
+        public General(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
+
         /// <summary>
         /// A command that will respond with pong.
         /// </summary>
@@ -19,8 +32,8 @@
         [Alias("p")]
         public async Task PingAsync()
         {
-            await this.Context.Channel.TriggerTypingAsync();
-            await this.Context.Channel.SendMessageAsync("Pong!");
+            await Context.Channel.TriggerTypingAsync();
+            await Context.Channel.SendMessageAsync("Pong!");
         }
 
         /// <summary>
@@ -33,7 +46,7 @@
         {
             if (socketGuildUser == null)
             {
-                socketGuildUser = this.Context.User as SocketGuildUser;
+                socketGuildUser = Context.User as SocketGuildUser;
             }
 
             var embed = new WatermelonEmbedBuilder()
@@ -45,7 +58,23 @@
                 .WithCurrentTimestamp()
                 .Build();
 
-            await this.ReplyAsync(embed: embed);
+            await ReplyAsync(embed: embed);
+        }
+
+        [Command("activity")]
+        public async Task Activity()
+        {
+            var httpClient = _httpClientFactory.CreateClient();
+            var response = await httpClient.GetStringAsync("https://www.boredapi.com/api/activity/");
+            var activity = Event.FromJson(response);
+
+            if (activity == null)
+            {
+                await ReplyAsync("An error occurred, please try again later.");
+                return;
+            }
+
+            await ReplyAsync($"**Activity:** {activity.Activity}\n**Participants:** {activity.Participants}\n**Type:** {activity.Type}\n**Price:** {activity.Price}\n**Accessibility:** {activity.Accessibility}");
         }
     }
 }
