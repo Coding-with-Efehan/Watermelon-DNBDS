@@ -1,15 +1,19 @@
 ﻿namespace Watermelon
 {
+    using System;
     using System.IO;
     using System.Threading.Tasks;
     using Discord;
     using Discord.Addons.Hosting;
     using Discord.Commands;
     using Discord.WebSocket;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
+    using Watermelon.Data;
+    using Watermelon.Data.Context;
     using Watermelon.Services;
 
     /// <summary>
@@ -34,7 +38,7 @@
                     x.AddConsole();
                     x.SetMinimumLevel(LogLevel.Debug);
                 })
-                .ConfigureDiscordHost<DiscordSocketClient>((context, config) =>
+                .ConfigureDiscordHost((context, config) =>
                 {
                     config.SocketConfig = new DiscordSocketConfig
                     {
@@ -55,7 +59,12 @@
                 {
                     services
                         .AddHostedService<CommandHandler>()
-                        .AddHttpClient();
+                        .AddHttpClient()
+                        .AddDbContextFactory<WatermelonDbContext>(options =>
+                        options.UseMySql(
+                            context.Configuration.GetConnectionString("Default"),
+                            new MySqlServerVersion(new Version(8, 0, 27))))
+                        .AddSingleton<DataAccessLayer>();
                 })
                 .UseConsoleLifetime();
 

@@ -9,11 +9,13 @@
     using Discord.Commands;
     using Discord.WebSocket;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
+    using Watermelon.Data;
 
     /// <summary>
     /// The class responsible for handling the commands and various events.
     /// </summary>
-    public class CommandHandler : InitializedService
+    public class CommandHandler : WatermelonService
     {
         private readonly IServiceProvider _provider;
         private readonly DiscordSocketClient _client;
@@ -27,7 +29,8 @@
         /// <param name="client">The <see cref="DiscordSocketClient"/> that should be injected.</param>
         /// <param name="service">The <see cref="CommandService"/> that should be injected.</param>
         /// <param name="configuration">The <see cref="IConfiguration"/> that should be injected.</param>
-        public CommandHandler(IServiceProvider provider, DiscordSocketClient client, CommandService service, IConfiguration configuration)
+        public CommandHandler(IServiceProvider provider, DiscordSocketClient client, CommandService service, IConfiguration configuration, ILogger<DiscordClientService> logger, DataAccessLayer dataAccessLayer)
+            : base(client, logger, configuration, dataAccessLayer)
         {
             _provider = provider;
             _client = client;
@@ -36,7 +39,7 @@
         }
 
         /// <inheritdoc/>
-        public override async Task InitializeAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             _client.MessageReceived += OnMessageReceived;
             _service.CommandExecuted += OnCommandExecuted;
@@ -66,7 +69,9 @@
             }
 
             var argPos = 0;
-            if (!message.HasStringPrefix(_configuration["Prefix"], ref argPos) && !message.HasMentionPrefix(_client.CurrentUser, ref argPos))
+            var user = message.Author as SocketGuildUser;
+            var prefix = DataAccessLayer.GetPrefix(user.Guild.Id);
+            if (!message.HasStringPrefix(prefix, ref argPos) && !message.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
                 return;
             }

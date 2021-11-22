@@ -6,12 +6,13 @@
     using Discord.Commands;
     using Discord.WebSocket;
     using Watermelon.Common;
+    using Watermelon.Data;
     using Watermelon.Models;
 
     /// <summary>
     /// The general module containing commands like ping.
     /// </summary>
-    public class General : ModuleBase<SocketCommandContext>
+    public class General : WatermelonModuleBase
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
@@ -19,7 +20,9 @@
         /// Initializes a new instance of the <see cref="General"/> class.
         /// </summary>
         /// <param name="httpClientFactory">The <see cref="IHttpClientFactory"/> to be used.</param>
-        public General(IHttpClientFactory httpClientFactory)
+        /// <param name="dataAccessLayer">The <see cref="DataAccessLayer"/> to be used.</param>
+        public General(IHttpClientFactory httpClientFactory, DataAccessLayer dataAccessLayer)
+            : base(dataAccessLayer)
         {
             _httpClientFactory = httpClientFactory;
         }
@@ -34,6 +37,19 @@
         {
             await Context.Channel.TriggerTypingAsync();
             await Context.Channel.SendMessageAsync("Pong!");
+        }
+
+        [Command("prefix")]
+        public async Task PrefixAsync(string prefix = null)
+        {
+            if (prefix == null)
+            {
+                await ReplyAsync($"The prefix of this guild is {Prefix}.");
+                return;
+            }
+
+            await DataAccessLayer.SetPrefix(Context.Guild.Id, prefix);
+            await ReplyAsync($"The prefix has been set to {prefix}.");
         }
 
         /// <summary>
@@ -75,6 +91,12 @@
             }
 
             await ReplyAsync($"**Activity:** {activity.Activity}\n**Participants:** {activity.Participants}\n**Type:** {activity.Type}\n**Price:** {activity.Price}\n**Accessibility:** {activity.Accessibility}");
+        }
+
+        [Command("embed")]
+        public async Task Embed(string title)
+        {
+            await SendEmbedAsync(title, "Bla bla bla");
         }
     }
 }
